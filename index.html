@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complete seu cadastro | TACO</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#314572; --navy-dark:#1c2942; --teal:#6aaec3; --magenta:#d00c65;
+    --orange:#e27b37; --lime:#c2d841; --bg:#f7f7f4; --line:#e3e6e4; --muted:#5b6472; --err:#b3261e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--navy-dark);-webkit-font-smoothing:antialiased}
+  .hero{width:100%;height:200px;object-fit:cover;object-position:center 45%;display:block;background:var(--navy-dark)}
+  .stripe{height:6px;background:linear-gradient(90deg,var(--navy) 0 20%,var(--teal) 20% 40%,var(--magenta) 40% 60%,var(--orange) 60% 80%,var(--lime) 80% 100%)}
+  main{max-width:480px;margin:0 auto;padding:20px 16px 40px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+  h1{font-size:23px;line-height:1.25;margin:0 0 8px}
+  .lead{color:var(--muted);font-size:15px;line-height:1.5;margin:0 0 22px}
+  .field{margin-bottom:16px}
+  label{display:block;font-size:14px;font-weight:600;margin-bottom:6px}
+  input[type=text],input[type=email],input[type=tel],input[type=date]{
+    width:100%;font:inherit;font-size:16px;padding:14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--navy-dark);outline:none;-webkit-appearance:none;appearance:none;min-height:50px}
+  input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(106,174,195,.25)}
+  .invalid input{border-color:var(--err)}
+  .error{font-size:13px;color:var(--err);margin-top:4px}
+  .note{font-size:13px;line-height:1.5;color:var(--muted);margin:4px 0 20px}
+  button{width:100%;font:inherit;font-size:17px;font-weight:700;color:#fff;background:var(--magenta);border:0;border-radius:12px;padding:16px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
+  .done{display:none;text-align:center}
+  .done .check{width:64px;height:64px;border-radius:50%;background:var(--lime);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:32px}
+  .testbar{display:none;background:#fff4e5;border:1px solid var(--orange);color:#8a4b12;font-size:13px;padding:10px 12px;border-radius:10px;margin-bottom:16px}
+  .failbar{display:none;background:#fdecea;border:1px solid var(--err);color:var(--err);font-size:14px;padding:10px 12px;border-radius:10px;margin-bottom:16px}
+  footer{text-align:center;font-size:12px;color:#9aa1a9;padding:0 16px 32px}
+</style>
+</head>
+<body>
+<img class="hero" src="header.jpeg" alt="Loja TACO">
+<div class="stripe"></div>
+
+<main>
+  <div class="testbar" id="testbar">Modo teste: nada está sendo gravado (falta colar o endereço da planilha em APPS_SCRIPT_URL).</div>
+
+  <section id="formView" class="card">
+    <h1>Complete seu cadastro e libere fácil seu cashback</h1>
+    <p class="lead">Leva menos de 1 minuto. Confirme os dados que você passou na loja e complete o restante.</p>
+
+    <div class="failbar" id="failbar">Não conseguimos enviar agora. Confira sua internet e tente de novo.</div>
+
+    <form id="form" novalidate>
+      <div class="field" data-f="cpf">
+        <label for="cpf">CPF</label>
+        <input id="cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" maxlength="14">
+        <div class="error"></div>
+      </div>
+      <div class="field" data-f="tel">
+        <label for="tel">Celular com DDD</label>
+        <input id="tel" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000" maxlength="15">
+        <div class="error"></div>
+      </div>
+      <div class="field" data-f="email">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="voce@exemplo.com">
+        <div class="error"></div>
+      </div>
+      <div class="field" data-f="cep">
+        <label for="cep">CEP</label>
+        <input id="cep" type="text" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9">
+        <div class="error"></div>
+      </div>
+      <div class="field" data-f="nasc">
+        <label for="nasc">Data de nascimento</label>
+        <input id="nasc" type="date" autocomplete="bday">
+        <div class="error"></div>
+      </div>
+
+      <p class="note">Manter esses dados em dia é importante para o acúmulo do cashback gerado pela sua compra em loja.</p>
+
+      <button type="submit" id="btn">Enviar</button>
+    </form>
+  </section>
+
+  <section id="doneView" class="card done">
+    <div class="check">✓</div>
+    <h1>Pronto, obrigado!</h1>
+    <p class="lead" style="margin-bottom:0">Seus dados foram atualizados.</p>
+  </section>
+</main>
+<footer>TACO · Todo mundo. Todo dia.</footer>
+
+<script>
+/* ============ CONFIGURAÇÃO — colar aqui o endereço do Apps Script ============ */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-7FE1bSzeUGmTeVDqYS5DFmUBdRLoqoTmFk5v1Hq4M8LvU73AzFY76ok2KTn_FYQx/exec';
+/* ============================================================================== */
+
+const $ = id => document.getElementById(id);
+if (!APPS_SCRIPT_URL) $('testbar').style.display = 'block';
+
+/* Loja de origem vem do link do SMS: ?loja=canoas (opcional) */
+const params = new URLSearchParams(location.search);
+const LOJA = (params.get('loja') || '').toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,40);
+
+/* ---- máscaras ---- */
+$('cpf').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  e.target.value = v;
+});
+$('tel').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g,'').slice(0,11);
+  if (v.length > 6) v = v.replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d+)/, '($1) $2');
+  e.target.value = v;
+});
+$('cep').addEventListener('input', e => {
+  let v = e.target.value.replace(/\D/g,'').slice(0,8);
+  if (v.length > 5) v = v.slice(0,5) + '-' + v.slice(5);
+  e.target.value = v;
+});
+
+/* ---- validações ---- */
+function cpfValido(cpf){
+  const n = cpf.replace(/\D/g,'');
+  if (n.length !== 11 || /^(\d)\1{10}$/.test(n)) return false;
+  const dig = len => {
+    let s = 0;
+    for (let i = 0; i < len; i++) s += parseInt(n[i]) * (len + 1 - i);
+    const r = (s * 10) % 11;
+    return r === 10 ? 0 : r;
+  };
+  return dig(9) === parseInt(n[9]) && dig(10) === parseInt(n[10]);
+}
+function telValido(t){
+  const n = t.replace(/\D/g,'');
+  return n.length === 11 && n[2] === '9' && parseInt(n.slice(0,2)) >= 11;   // DDD + 9 + 8 dígitos
+}
+function setErr(field, msg){
+  const box = document.querySelector('[data-f="'+field+'"]');
+  box.classList.toggle('invalid', !!msg);
+  box.querySelector('.error').textContent = msg || '';
+}
+function validar(){
+  let ok = true;
+  const hoje = new Date().toISOString().slice(0,10);
+  const nasc = $('nasc').value;
+  setErr('cpf',   cpfValido($('cpf').value) ? '' : (ok = false, 'Confira o CPF.'));
+  setErr('tel',   telValido($('tel').value) ? '' : (ok = false, 'Informe o celular com DDD.'));
+  setErr('email', /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim()) ? '' : (ok = false, 'Confira o e-mail.'));
+  setErr('cep',   $('cep').value.replace(/\D/g,'').length === 8 ? '' : (ok = false, 'Informe o CEP com 8 números.'));
+  setErr('nasc',  (nasc && nasc < hoje && nasc >= '1900-01-01') ? '' : (ok = false, 'Informe uma data válida.'));
+  return ok;
+}
+
+/* ---- envio ---- */
+$('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  $('failbar').style.display = 'none';
+  if (!validar()) return;
+  $('btn').disabled = true; $('btn').textContent = 'Enviando…';
+
+  const dados = {
+    cpf: $('cpf').value,
+    telefone: $('tel').value,
+    email: $('email').value.trim().toLowerCase(),
+    cep: $('cep').value,
+    nascimento: $('nasc').value,          // AAAA-MM-DD
+    loja: LOJA,
+    enviado_em: new Date().toISOString()
+  };
+
+  if (!APPS_SCRIPT_URL) {
+    console.log('[modo teste] dados que seriam gravados:', dados);
+  } else {
+    try {
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST', mode: 'no-cors',   // o Apps Script não devolve cabeçalhos CORS
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(dados)
+      });
+    } catch (err) {
+      $('failbar').style.display = 'block';
+      $('btn').disabled = false; $('btn').textContent = 'Enviar';
+      return;
+    }
+  }
+  $('formView').style.display = 'none';
+  $('doneView').style.display = 'block';
+  window.scrollTo(0,0);
+});
+</script>
+</body>
+</html>
